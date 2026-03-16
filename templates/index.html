@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeLi Analytics — Tendencias y Productos</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">📊</span>
+        <span class="logo-text">MeLi <strong>Analytics</strong></span>
+      </div>
+      <div class="header-controls">
+        <label for="site-select" class="sr-only">País</label>
+        <select id="site-select" class="site-select">
+          {% for id, info in sites.items() %}
+          <option value="{{ id }}" {% if id == 'MLA' %}selected{% endif %}>
+            {{ info.flag }} {{ info.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO STATS BAR -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat-item skeleton" id="stat-0"></div>
+    <div class="stat-item skeleton" id="stat-1"></div>
+    <div class="stat-item skeleton" id="stat-2"></div>
+    <div class="stat-item skeleton" id="stat-3"></div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- CATEGORY FILTER -->
+    <div class="filter-row">
+      <div class="filter-label">Categoría:</div>
+      <div class="categories-scroll" id="categories-scroll">
+        <button class="cat-btn active" data-id="">Todas</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="trending">
+        <span class="tab-icon">🔥</span> Tendencias
+      </button>
+      <button class="tab" data-tab="most-sold">
+        <span class="tab-icon">🏆</span> Más Vendidos
+      </button>
+      <button class="tab" data-tab="cyclical">
+        <span class="tab-icon">🔄</span> Cíclicos / Estacionales
+      </button>
+      <button class="tab" data-tab="chart">
+        <span class="tab-icon">📈</span> Gráficos
+      </button>
+    </nav>
+
+    <!-- TAB CONTENT -->
+    <div class="tab-content" id="tab-trending">
+      <div class="section-header">
+        <h2>🔥 Productos en Tendencia</h2>
+        <p>Las búsquedas más populares en este momento</p>
+      </div>
+      <div id="trending-container" class="trends-grid"></div>
+    </div>
+
+    <div class="tab-content hidden" id="tab-most-sold">
+      <div class="section-header">
+        <h2>🏆 Más Vendidos</h2>
+        <p>Productos con mayor volumen de ventas</p>
+      </div>
+      <div id="most-sold-container" class="products-grid"></div>
+    </div>
+
+    <div class="tab-content hidden" id="tab-cyclical">
+      <div class="section-header" id="cyclical-header">
+        <h2>🔄 Productos Estacionales / Cíclicos</h2>
+        <p>Productos que suben en ventas según la época del año</p>
+      </div>
+      <div id="cyclical-container"></div>
+    </div>
+
+    <div class="tab-content hidden" id="tab-chart">
+      <div class="section-header">
+        <h2>📈 Análisis por Categorías</h2>
+        <p>Distribución de publicaciones por categoría</p>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Top Categorías por Publicaciones</h3>
+          <div class="chart-wrap"><canvas id="chart-categories"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Descuentos en Más Vendidos</h3>
+          <div class="chart-wrap"><canvas id="chart-discounts"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- TOAST -->
+  <div class="toast hidden" id="toast"></div>
+
+  <!-- LOADING OVERLAY -->
+  <div class="loading-overlay hidden" id="loading-overlay">
+    <div class="spinner-big"></div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
