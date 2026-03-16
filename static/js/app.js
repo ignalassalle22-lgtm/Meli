@@ -1,6 +1,5 @@
 /* ===== STATE ===== */
 const state = {
-  site: "MLA",
   category: "",
   categories: [],
   activeTab: "trending",
@@ -11,7 +10,6 @@ const state = {
 
 /* ===== DOM REFS ===== */
 const $ = (id) => document.getElementById(id);
-const siteSelect = $("site-select");
 const categoriesScroll = $("categories-scroll");
 const loadingOverlay = $("loading-overlay");
 const toast = $("toast");
@@ -28,10 +26,9 @@ function showToast(msg, dur = 3000) {
   toastTimer = setTimeout(() => toast.classList.add("hidden"), dur);
 }
 
-function formatPrice(price, currency) {
+function formatPrice(price) {
   if (!price) return "—";
-  const locale = currency === "BRL" ? "pt-BR" : currency === "MXN" ? "es-MX" : "es-AR";
-  return new Intl.NumberFormat(locale, { style: "currency", currency: currency || "ARS", maximumFractionDigits: 0 }).format(price);
+  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(price);
 }
 
 function formatNumber(n) {
@@ -57,7 +54,7 @@ function renderProductCard(p) {
   const free = p.free_shipping ? `<span class="badge-free">Envío gratis</span>` : "";
   const used = p.condition === "used" ? `<span class="badge-used">Usado</span>` : "";
   const orig = p.original_price && p.discount > 0
-    ? `<div class="product-original-price">${formatPrice(p.original_price, p.currency_id)}</div>`
+    ? `<div class="product-original-price">${formatPrice(p.original_price)}</div>`
     : "";
   const rating = p.rating
     ? `<span class="product-rating">${stars(p.rating)}</span>`
@@ -80,7 +77,7 @@ function renderProductCard(p) {
       <div class="product-body">
         <div class="product-title">${escapeHtml(p.title)}</div>
         ${orig}
-        <div class="product-price">${formatPrice(p.price, p.currency_id)}</div>
+        <div class="product-price">${formatPrice(p.price)}</div>
         <div class="product-meta">
           ${rating}
           ${sold}
@@ -118,7 +115,7 @@ async function apiFetch(url) {
 async function loadCategories() {
   categoriesScroll.innerHTML = `<button class="cat-btn active" data-id="">Todas</button><span class="spinner"></span>`;
   try {
-    const cats = await apiFetch(`/api/categories/${state.site}`);
+    const cats = await apiFetch(`/api/categories`);
     state.categories = cats;
     categoriesScroll.innerHTML = `<button class="cat-btn active" data-id="">Todas</button>` +
       cats.slice(0, 20).map(c =>
@@ -145,7 +142,7 @@ async function loadStats() {
     if (el) el.classList.add("skeleton");
   });
   try {
-    const data = await apiFetch(`/api/stats/${state.site}`);
+    const data = await apiFetch(`/api/stats`);
     state.statsData = data;
     const bar = $("stats-bar");
     bar.innerHTML = data.slice(0, 4).map(s => `
@@ -166,7 +163,7 @@ async function loadTrending() {
   container.innerHTML = skeletonCards(8);
   try {
     const params = state.category ? `?category_id=${state.category}` : "";
-    const data = await apiFetch(`/api/trending/${state.site}${params}`);
+    const data = await apiFetch(`/api/trending${params}`);
 
     if (!data.length) {
       container.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">No hay tendencias disponibles para esta selección.</div></div>`;
@@ -195,7 +192,7 @@ async function loadMostSold() {
   container.innerHTML = skeletonCards(12);
   try {
     const params = state.category ? `?category_id=${state.category}` : "";
-    const data = await apiFetch(`/api/most-sold/${state.site}${params}`);
+    const data = await apiFetch(`/api/most-sold${params}`);
     state.mostSoldData = data.products || [];
 
     if (!state.mostSoldData.length) {
@@ -217,7 +214,7 @@ async function loadCyclical() {
   const header = $("cyclical-header");
   container.innerHTML = `<div style="text-align:center;padding:2rem"><span class="spinner"></span></div>`;
   try {
-    const data = await apiFetch(`/api/cyclical/${state.site}`);
+    const data = await apiFetch(`/api/cyclical`);
 
     header.innerHTML = `
       <h2>${data.icon || "🔄"} Productos Estacionales — ${data.season}</h2>
@@ -372,15 +369,6 @@ function refreshActiveTab() {
 
 /* ===== INIT ===== */
 function init() {
-  // Site change
-  siteSelect.addEventListener("change", () => {
-    state.site = siteSelect.value;
-    state.category = "";
-    state.statsData = [];
-    state.mostSoldData = [];
-    Promise.all([loadCategories(), loadStats()]).then(() => refreshActiveTab());
-  });
-
   // Tab clicks
   document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => {

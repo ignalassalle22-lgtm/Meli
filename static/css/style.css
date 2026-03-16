@@ -62,19 +62,15 @@ body {
 .logo-text { font-size: 1.3rem; color: var(--text); letter-spacing: 0.02em; }
 .logo-text strong { color: var(--yellow); }
 
-.site-select {
+.country-badge {
   background: var(--card);
-  color: var(--text);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 1rem;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: border-color var(--transition);
-  outline: none;
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
 }
-.site-select:hover, .site-select:focus { border-color: var(--yellow); }
-.site-select option { background: var(--card); }
 
 /* ===== STATS BAR ===== */
 .stats-bar {

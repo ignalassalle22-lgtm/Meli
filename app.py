@@ -6,32 +6,21 @@ import concurrent.futures
 app = Flask(__name__)
 
 ML_BASE_URL = "https://api.mercadolibre.com"
-
-SITES = {
-    "MLA": {"name": "Argentina", "currency": "ARS", "flag": "🇦🇷"},
-    "MLB": {"name": "Brasil", "currency": "BRL", "flag": "🇧🇷"},
-    "MLM": {"name": "México", "currency": "MXN", "flag": "🇲🇽"},
-    "MLC": {"name": "Chile", "currency": "CLP", "flag": "🇨🇱"},
-    "MCO": {"name": "Colombia", "currency": "COP", "flag": "🇨🇴"},
-    "MLU": {"name": "Uruguay", "currency": "UYU", "flag": "🇺🇾"},
-    "MPE": {"name": "Perú", "currency": "PEN", "flag": "🇵🇪"},
-}
+SITE = "MLA"
 
 SEASONAL_CATEGORIES = {
-    "MLA": {
-        1:  {"name": "Verano", "icon": "☀️",   "keywords": ["ventilador", "pileta inflable", "traje de baño", "protector solar", "reposera"]},
-        2:  {"name": "Verano", "icon": "☀️",   "keywords": ["aire acondicionado", "ojotas", "sombrilla playa", "heladera portatil", "mate"]},
-        3:  {"name": "Otoño",  "icon": "🍂",   "keywords": ["paraguas", "impermeable", "botas de lluvia", "calefactor", "térmica"]},
-        4:  {"name": "Otoño",  "icon": "🍂",   "keywords": ["campera", "buzos", "abrigo", "calefactor electrico", "frazada"]},
-        5:  {"name": "Otoño",  "icon": "🍂",   "keywords": ["estufa a gas", "botas cuero", "colchon termico", "guantes", "bufanda"]},
-        6:  {"name": "Invierno","icon": "❄️",   "keywords": ["estufa electrica", "calefactor tiro balanceado", "frazada termica", "campera de pluma", "botas nieve"]},
-        7:  {"name": "Invierno","icon": "❄️",   "keywords": ["calefaccion", "ropa termica", "sierras nevadas", "chocolatera", "humidificador"]},
-        8:  {"name": "Invierno","icon": "❄️",   "keywords": ["deshumidificador", "aislante pared", "caño estufas", "gorros lana", "medias termicas"]},
-        9:  {"name": "Primavera","icon": "🌸",  "keywords": ["mochilas escolares", "utiles escolares", "ropa deportiva", "bicicleta", "jardineria"]},
-        10: {"name": "Primavera","icon": "🌸",  "keywords": ["decoracion jardin", "semillas flores", "herramientas jardin", "zapatillas running", "roller"]},
-        11: {"name": "Pre-Verano","icon": "🌞", "keywords": ["traje de baño", "ventilador techo", "juegos de agua", "camping", "inflable"]},
-        12: {"name": "Navidad", "icon": "🎄",  "keywords": ["arbol navidad", "adornos navideños", "luces navidad", "juguetes navidad", "regalo electronico"]},
-    }
+    1:  {"name": "Verano",     "icon": "☀️",   "keywords": ["ventilador", "pileta inflable", "traje de baño", "protector solar", "reposera"]},
+    2:  {"name": "Verano",     "icon": "☀️",   "keywords": ["aire acondicionado", "ojotas", "sombrilla playa", "heladera portatil", "mate"]},
+    3:  {"name": "Otoño",      "icon": "🍂",   "keywords": ["paraguas", "impermeable", "botas de lluvia", "calefactor", "térmica"]},
+    4:  {"name": "Otoño",      "icon": "🍂",   "keywords": ["campera", "buzos", "abrigo", "calefactor electrico", "frazada"]},
+    5:  {"name": "Otoño",      "icon": "🍂",   "keywords": ["estufa a gas", "botas cuero", "colchon termico", "guantes", "bufanda"]},
+    6:  {"name": "Invierno",   "icon": "❄️",   "keywords": ["estufa electrica", "calefactor tiro balanceado", "frazada termica", "campera de pluma", "botas nieve"]},
+    7:  {"name": "Invierno",   "icon": "❄️",   "keywords": ["calefaccion", "ropa termica", "sierras nevadas", "chocolatera", "humidificador"]},
+    8:  {"name": "Invierno",   "icon": "❄️",   "keywords": ["deshumidificador", "aislante pared", "caño estufas", "gorros lana", "medias termicas"]},
+    9:  {"name": "Primavera",  "icon": "🌸",   "keywords": ["mochilas escolares", "utiles escolares", "ropa deportiva", "bicicleta", "jardineria"]},
+    10: {"name": "Primavera",  "icon": "🌸",   "keywords": ["decoracion jardin", "semillas flores", "herramientas jardin", "zapatillas running", "roller"]},
+    11: {"name": "Pre-Verano", "icon": "🌞",   "keywords": ["traje de baño", "ventilador techo", "juegos de agua", "camping", "inflable"]},
+    12: {"name": "Navidad",    "icon": "🎄",   "keywords": ["arbol navidad", "adornos navideños", "luces navidad", "juguetes navidad", "regalo electronico"]},
 }
 
 def get_headers():
@@ -77,29 +66,24 @@ def format_product(item):
 
 @app.route("/")
 def index():
-    return render_template("index.html", sites=SITES)
+    return render_template("index.html")
 
 
-@app.route("/api/sites")
-def api_sites():
-    return jsonify(SITES)
-
-
-@app.route("/api/categories/<site_id>")
-def api_categories(site_id):
+@app.route("/api/categories")
+def api_categories():
     try:
-        r = requests.get(f"{ML_BASE_URL}/sites/{site_id}/categories", headers=get_headers(), timeout=10)
+        r = requests.get(f"{ML_BASE_URL}/sites/{SITE}/categories", headers=get_headers(), timeout=10)
         r.raise_for_status()
         return jsonify(r.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/trending/<site_id>")
-def api_trending(site_id):
+@app.route("/api/trending")
+def api_trending():
     category_id = request.args.get("category_id")
     try:
-        url = f"{ML_BASE_URL}/trends/{site_id}/{category_id}" if category_id else f"{ML_BASE_URL}/trends/{site_id}"
+        url = f"{ML_BASE_URL}/trends/{SITE}/{category_id}" if category_id else f"{ML_BASE_URL}/trends/{SITE}"
         r = requests.get(url, headers=get_headers(), timeout=10)
         r.raise_for_status()
         trends = r.json()
@@ -110,7 +94,7 @@ def api_trending(site_id):
             if category_id:
                 params["category"] = category_id
             try:
-                sr = requests.get(f"{ML_BASE_URL}/sites/{site_id}/search", params=params, headers=get_headers(), timeout=8)
+                sr = requests.get(f"{ML_BASE_URL}/sites/{SITE}/search", params=params, headers=get_headers(), timeout=8)
                 if sr.ok:
                     items = sr.json().get("results", [])
                     return {
@@ -130,15 +114,15 @@ def api_trending(site_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/most-sold/<site_id>")
-def api_most_sold(site_id):
+@app.route("/api/most-sold")
+def api_most_sold():
     category_id = request.args.get("category_id")
     limit = int(request.args.get("limit", 20))
     try:
         params = {"sort": "sold_quantity_desc", "limit": limit}
         if category_id:
             params["category"] = category_id
-        r = requests.get(f"{ML_BASE_URL}/sites/{site_id}/search", params=params, headers=get_headers(), timeout=10)
+        r = requests.get(f"{ML_BASE_URL}/sites/{SITE}/search", params=params, headers=get_headers(), timeout=10)
         r.raise_for_status()
         data = r.json()
         return jsonify({
@@ -149,17 +133,16 @@ def api_most_sold(site_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/cyclical/<site_id>")
-def api_cyclical(site_id):
+@app.route("/api/cyclical")
+def api_cyclical():
     month = datetime.now().month
-    site_seasons = SEASONAL_CATEGORIES.get(site_id, SEASONAL_CATEGORIES.get("MLA", {}))
-    season_data = site_seasons.get(month, site_seasons.get(1, {}))
+    season_data = SEASONAL_CATEGORIES.get(month, SEASONAL_CATEGORIES[1])
     keywords = season_data.get("keywords", [])
 
     def fetch_seasonal_keyword(keyword):
         params = {"q": keyword, "sort": "sold_quantity_desc", "limit": 5}
         try:
-            r = requests.get(f"{ML_BASE_URL}/sites/{site_id}/search", params=params, headers=get_headers(), timeout=8)
+            r = requests.get(f"{ML_BASE_URL}/sites/{SITE}/search", params=params, headers=get_headers(), timeout=8)
             if r.ok:
                 items = r.json().get("results", [])
                 return {
@@ -181,18 +164,17 @@ def api_cyclical(site_id):
     })
 
 
-@app.route("/api/stats/<site_id>")
-def api_stats(site_id):
-    """Get quick stats: top categories by total listings."""
+@app.route("/api/stats")
+def api_stats():
     try:
-        r = requests.get(f"{ML_BASE_URL}/sites/{site_id}/categories", headers=get_headers(), timeout=10)
+        r = requests.get(f"{ML_BASE_URL}/sites/{SITE}/categories", headers=get_headers(), timeout=10)
         r.raise_for_status()
         categories = r.json()
 
         def fetch_cat_count(cat):
             try:
                 sr = requests.get(
-                    f"{ML_BASE_URL}/sites/{site_id}/search",
+                    f"{ML_BASE_URL}/sites/{SITE}/search",
                     params={"category": cat["id"], "limit": 1},
                     headers=get_headers(),
                     timeout=6,

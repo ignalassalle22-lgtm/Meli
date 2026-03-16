@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MeLi Analytics — Tendencias y Productos</title>
+  <title>MeLi Analytics Argentina 🇦🇷</title>
   <link rel="stylesheet" href="/static/css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -15,16 +15,7 @@
         <span class="logo-icon">📊</span>
         <span class="logo-text">MeLi <strong>Analytics</strong></span>
       </div>
-      <div class="header-controls">
-        <label for="site-select" class="sr-only">País</label>
-        <select id="site-select" class="site-select">
-          {% for id, info in sites.items() %}
-          <option value="{{ id }}" {% if id == 'MLA' %}selected{% endif %}>
-            {{ info.flag }} {{ info.name }}
-          </option>
-          {% endfor %}
-        </select>
-      </div>
+      <div class="country-badge">🇦🇷 Argentina</div>
     </div>
   </header>
 
