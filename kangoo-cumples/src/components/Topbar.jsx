@@ -1,35 +1,34 @@
 import React from 'react'
 
-export default function Topbar({ onNuevoEvento, vistaActiva, setVistaActiva }) {
-  const tabs = [
-    { id: 'lista', label: '📋 Lista' },
-    { id: 'calendario', label: '📅 Calendario' },
-    { id: 'metricas', label: '📊 Métricas' },
-    { id: 'config', label: '⚙️ Config' },
-  ]
+const TABS = [
+  { id: 'eventos', label: '🎂 Eventos' },
+  { id: 'calendario', label: '📅 Calendario' },
+  { id: 'metricas', label: '📊 Métricas' },
+  { id: 'config', label: '💼 Datos de venta' },
+]
 
+export default function Topbar({ activeSection, onNav, onNuevo }) {
   return (
-    <header className="topbar">
-      <div className="topbar-brand">
-        <span className="topbar-icon">🎂</span>
-        <span className="topbar-title">KangooCumples</span>
+    <div className="topbar">
+      <div className="logo-wrap">
+        <div className="logo-emoji">🦘</div>
+        <div className="logo-texts">
+          <div className="logo-name">Kangoo<span>Cumples</span></div>
+          <div className="logo-sub">Kangaroo Fun</div>
+        </div>
       </div>
-
-      <nav className="topbar-nav">
-        {tabs.map((tab) => (
+      <div className="nav">
+        {TABS.map(t => (
           <button
-            key={tab.id}
-            className={`topbar-tab ${vistaActiva === tab.id ? 'active' : ''}`}
-            onClick={() => setVistaActiva(tab.id)}
+            key={t.id}
+            className={`nb${activeSection === t.id ? ' on' : ''}`}
+            onClick={() => onNav(t.id)}
           >
-            {tab.label}
+            {t.label}
           </button>
         ))}
-      </nav>
-
-      <button className="btn-primary" onClick={onNuevoEvento}>
-        + Nuevo evento
-      </button>
-    </header>
+      </div>
+      <button className="bp" onClick={onNuevo}>＋ Nuevo evento</button>
+    </div>
   )
 }
